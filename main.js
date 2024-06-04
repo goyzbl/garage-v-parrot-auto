@@ -18,36 +18,42 @@ allLinks.forEach(function (item) {
     menu.classList.toggle("active-menu");
   });
 });
-// Form-modal //
-const formOpenBtn = document.querySelector("#form-open"),
-  home = document.querySelector(".home"),
-  formContainer = document.querySelector(".form_container"),
-  formCloseBtn = document.querySelector(".form_close"),
-  signupBtn = document.querySelector("#signup"),
-  loginBtn = document.querySelector("#login"),
-  pwShowHide = document.querySelectorAll(".pw_hide");
-formOpenBtn.addEventListener("click", () => home.classList.add("show"));
-formCloseBtn.addEventListener("click", () => home.classList.remove("show"));
-pwShowHide.forEach((icon) => {
-  icon.addEventListener("click", () => {
-    let getPwInput = icon.parentElement.querySelector("input");
-    if (getPwInput.type === "password") {
-      getPwInput.type = "text";
-      icon.classList.replace("uil-eye-slash", "uil uil-eye");
-    } else {
-      getPwInput.type = "password";
-      icon.classList.replace("uil uil-eye", "uil-eye-slash");
-    }
-  });
-});
-signupBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  formContainer.classList.add("active");
-});
-loginBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  formContainer.classList.remove("active");
-});
+// Form-modal
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const formOpenBtn = document.querySelector("#form-open"),
+          formContainer = document.querySelector(".form_container"),
+          formCloseBtn = document.querySelector(".form_close"),
+          signupBtn = document.querySelector("#signup"),
+          loginBtn = document.querySelector("#login"),
+          pwShowHide = document.querySelectorAll(".pw_hide");
+
+        formOpenBtn.addEventListener("click", () => formContainer.classList.add("show"));
+        formCloseBtn.addEventListener("click", () => formContainer.classList.remove("show"));
+        pwShowHide.forEach((icon) => {
+          icon.addEventListener("click", () => {
+            let getPwInput = icon.parentElement.querySelector("input");
+            if (getPwInput.type === "password") {
+              getPwInput.type = "text";
+              icon.classList.replace("uil-eye-slash", "uil-eye");
+            } else {
+              getPwInput.type = "password";
+              icon.classList.replace("uil-eye", "uil-eye-slash");
+            }
+          });
+        });
+        signupBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          formContainer.classList.add("active");
+        });
+        loginBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          formContainer.classList.remove("active");
+        });
+      });
+
+
+
 
 window.onload = () => {
   // On va chercher toutes les étoiles
@@ -105,13 +111,21 @@ window.onload = () => {
     }
   }
 };
-const modalContainer = document.querySelector(".modal-container");
-const modalTriggers = document.querySelectorAll(".modal-trigger");
-
-modalTriggers.forEach((trigger) =>
-  trigger.addEventListener("click", toggleModal)
-);
-
-function toggleModal() {
-  modalContainer.classList.toggle("active");
+function openModal(car) {
+  document.getElementById('modalTitle').innerText = car.title;
+  document.getElementById('modalImage').src = car.main_image;
+  document.getElementById('modalDesc').innerText = "Description: " + (car.description || 'Non disponible');
+  document.getElementById('modalMileage').innerText = "Kilométrage : " + car.mileage + " km";
+  document.getElementById('modalYear').innerText = "Année : " + car.year;
+  document.getElementById('modalPrice').innerText = "Prix : " + car.price + " €";
+  document.getElementById('modal-container').classList.add('active');
 }
+
+function closeModal() {
+  document.getElementById('modal-container').classList.remove('active');
+}
+
+function purchaseCar() {
+  alert("Fonction d'achat en cours de développement.");
+}
+

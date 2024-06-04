@@ -1,17 +1,38 @@
-<?php 
- $email_admin = "liamboyer12@gmail.com"
- $objet = "Contact via le site web";
+<?php
+session_start();
 
- if(isset($_POST["envoyer"]) && !empty($_POST["envoyer"])){
-    if(isset($_POST["nom"]) && !empty($_POST["nom"]) && !empty($_POST["email"]) && !empty($_POST["message"]) )
+// Configuration de la base de données
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "garage_db";
 
-     $message = $_POST["message"];
-     $header = 'Form'. $_POST["email"] . "\r\n" .
-      "MIME-Version: 1.0' . "r\n\" .
-      'Content-type: text/html; charset-utf-8';
-  if(mail($email_admin,$objet,$contenu_message,$headers))
-  {
-   retunr header("location:index.php?success");
- }
-   header("location:index.php?error");
+// Connexion à la base de données
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Vérification de la connexion
+if ($conn->connect_error) {
+    die("Échec de la connexion : " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['nom'];
+    $email = $_POST['email'];
+    $message = $_POST['message'];
+
+    // Insertion du message de contact
+    $sql = "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $name, $email, $message);
+    
+    if ($stmt->execute()) {
+        echo "Message envoyé avec succès.";
+    } else {
+        echo "Erreur lors de l'envoi du message.";
+    }
+
+    $stmt->close();
+}
+
+$conn->close();
 ?>
