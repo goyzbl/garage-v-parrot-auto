@@ -1,44 +1,41 @@
 <?php
+require 'config.php';
 session_start();
 
-// Récupérer les informations de connexion de la base de données à partir des variables d'environnement
-$cleardb_url = parse_url(getenv("CLEARDB_DATABASE_URL"));
-$server = $cleardb_url["host"];
-$username = $cleardb_url["user"];
-$password = $cleardb_url["pass"];
-$db = substr($cleardb_url["path"], 1);
-
-// Connexion à la base de données
-$conn = new mysqli($server, $username, $password, $db);
-
-if ($conn->connect_error) {
-    die("Échec de la connexion : " . $conn->connect_error);
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $sql = "SELECT id, password, role FROM users WHERE email = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($user_id, $hashed_password, $role);
-    $stmt->fetch();
+    $sql = "SELECT * FROM users WHERE email = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
 
-    if ($stmt->num_rows > 0 && password_verify($password, $hashed_password)) {
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['email'] = $email;
-        $_SESSION['role'] = $role;
-        header("Location: profile.php");
-        exit();
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['role'] = $user['role'];
+        header("Location: dashboard.php");
     } else {
-        echo "Identifiants invalides.";
+        echo "Identifiants incorrects.";
     }
-
-    $stmt->close();
 }
-
-$conn->close();
 ?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Connexion</h1>
+    <form method="post">
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="password">Mot de passe:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">Se connecter</button>
+    </form>
+</body>
+</html>

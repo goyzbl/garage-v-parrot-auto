@@ -1,5 +1,5 @@
 <?php
-session_start();
+require 'config.php';
 ?>
 
 <!DOCTYPE html>
@@ -15,8 +15,8 @@ session_start();
     <link rel="stylesheet" type="text/css" media="screen" href="style.css">
 </head>
 <body>
-     <!-- Navigation -->
-     <header class="header">
+    <!-- Navigation -->
+    <header class="header">
         <nav class="nav">
             <div class="nav_logo">
                 <img src="ressources/GarageVP.svg" alt="Garage VP">
@@ -164,50 +164,47 @@ session_start();
         </div>
     </div>
 
-   <!-- Voitures d'occasion -->
-<div class="vehicule-title" id="vente">Nos véhicules d'occasions</div>
-<section class="container">
-    <?php
-    // Connexion à la base de données
-    $conn = new mysqli('localhost', 'root', '', 'garage_db');
-    if ($conn->connect_error) {
-        die("Échec de la connexion : " . $conn->connect_error);
-    }
-    $sql = "SELECT * FROM cars";
-    $result = $conn->query($sql);
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            echo "<div class='card'>";
-            echo "<div class='card-image' style='background-image: url(" . $row['main_image'] . ");'></div>";
-            echo "<h3>" . $row['title'] . "</h3>";
-            echo "<p>Kilométrage : " . $row['mileage'] . " km</p>";
-            echo "<p>Année: " . $row['year'] . "</p>";
-            echo "<p>Prix : <span class='span'>" . $row['price'] . " €</span></p>";
-            echo "<button class='card-button' onclick='openModal(" . json_encode($row) . ")'>Acheter</button>";
-            echo "</div>";
+    <!-- Voitures d'occasion -->
+    <div class="vehicule-title" id="vente">Nos véhicules d'occasions</div>
+    <section class="container">
+        <?php
+        // Connexion à la base de données
+        require 'config.php';
+
+        $sql = "SELECT * FROM cars";
+        $stmt = $pdo->query($sql);
+
+        if ($stmt->rowCount() > 0) {
+            while ($row = $stmt->fetch()) {
+                echo "<div class='card'>";
+                echo "<div class='card-image' style='background-image: url(" . $row['main_image'] . ");'></div>";
+                echo "<h3>" . $row['title'] . "</h3>";
+                echo "<p>Kilométrage : " . $row['mileage'] . " km</p>";
+                echo "<p>Année: " . $row['year'] . "</p>";
+                echo "<p>Prix : <span class='span'>" . $row['price'] . " €</span></p>";
+                echo "<button class='card-button' onclick='openModal(" . json_encode($row) . ")'>Acheter</button>";
+                echo "</div>";
+            }
+        } else {
+            echo "Aucune voiture d'occasion disponible.";
         }
-    } else {
-        echo "Aucune voiture d'occasion disponible.";
-    }
-    $conn->close();
-    ?>
-</section>
+        ?>
+    </section>
 
-<!-- Modal pour afficher les détails de la voiture -->
-<div class="modal-container" id="modal-container">
-    <div class="overlay" onclick="closeModal()"></div>
-    <div class="modal">
-        <button class="close-modal" onclick="closeModal()">X</button>
-        <h1 id="modalTitle"></h1>
-        <img id="modalImage" src="" width="100%">
-        <p id="modalDesc"></p>
-        <p id="modalMileage"></p>
-        <p id="modalYear"></p>
-        <p id="modalPrice"></p>
-        <button class="button-modal" onclick="purchaseCar()">Acheter</button>
+    <!-- Modal pour afficher les détails de la voiture -->
+    <div class="modal-container" id="modal-container">
+        <div class="overlay" onclick="closeModal()"></div>
+        <div class="modal">
+            <button class="close-modal" onclick="closeModal()">X</button>
+            <h1 id="modalTitle"></h1>
+            <img id="modalImage" src="" width="100%">
+            <p id="modalDesc"></p>
+            <p id="modalMileage"></p>
+            <p id="modalYear"></p>
+            <p id="modalPrice"></p>
+            <button class="button-modal" onclick="purchaseCar()">Acheter</button>
+        </div>
     </div>
-</div>
-
 
     <!-- Avis -->
     <div class="avis-container" id="avis">
@@ -239,14 +236,13 @@ session_start();
             <!-- Les témoignages approuvés s'affichent ici -->
             <?php
             // Connexion à la base de données
-            $conn = new mysqli('localhost', 'root', '', 'garage_db');
-            if ($conn->connect_error) {
-                die("Échec de la connexion : " . $conn->connect_error);
-            }
+            require 'config.php';
+
             $sql = "SELECT * FROM testimonials WHERE approved = 1";
-            $result = $conn->query($sql);
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
+            $stmt = $pdo->query($sql);
+
+            if ($stmt->rowCount() > 0) {
+                while ($row = $stmt->fetch()) {
                     echo "<div class='avis'>";
                     echo "<h3>" . $row['name'] . "</h3>";
                     echo "<p>" . $row['comment'] . "</p>";
@@ -256,7 +252,6 @@ session_start();
             } else {
                 echo "Aucun témoignage disponible pour le moment.";
             }
-            $conn->close();
             ?>
         </div>
     </div>
@@ -290,12 +285,12 @@ session_start();
             <div class="horaire">
                 <h2>Nos horaires :</h2>
                 <p><span> Lundi :</span> 8h45 - 12h, 14h - 18h</p>
-          <p><span>Mardi :</span> 8h45 - 12h, 14h - 18h</p>
-          <p><span>Mercredi :</span> 8h45 - 12h, 14h - 18h</p>
-          <p><span>Jeudi :</span> 8h45 - 12h, 14h - 18h</p>
-          <p><span>Vendredi :</span> 8h45 - 12h, 14h - 18h</p>
-          <p><span>Samedi :</span> 9h30 - 13h, 15h - 19h</p>
-          <p><span>Dimanche :</span> Fermé</p>
+                <p><span>Mardi :</span> 8h45 - 12h, 14h - 18h</p>
+                <p><span>Mercredi :</span> 8h45 - 12h, 14h - 18h</p>
+                <p><span>Jeudi :</span> 8h45 - 12h, 14h - 18h</p>
+                <p><span>Vendredi :</span> 8h45 - 12h, 14h - 18h</p>
+                <p><span>Samedi :</span> 9h30 - 13h, 15h - 19h</p>
+                <p><span>Dimanche :</span> Fermé</p>
             </div>
         </div>
     </section>
@@ -340,24 +335,23 @@ session_start();
     <footer>Tous Droits Réservés &copy;</footer>
     <script src="main.js"></script>
     <script>
-function openModal(car) {
-    document.getElementById('modalTitle').innerText = car.title;
-    document.getElementById('modalImage').src = car.main_image;
-    document.getElementById('modalDesc').innerText = "Description: " + (car.description || 'Non disponible');
-    document.getElementById('modalMileage').innerText = "Kilométrage : " + car.mileage + " km";
-    document.getElementById('modalYear').innerText = "Année : " + car.year;
-    document.getElementById('modalPrice').innerText = "Prix : " + car.price + " €";
-    document.getElementById('modal-container').classList.add('active');
-}
+        function openModal(car) {
+            document.getElementById('modalTitle').innerText = car.title;
+            document.getElementById('modalImage').src = car.main_image;
+            document.getElementById('modalDesc').innerText = "Description: " + (car.description || 'Non disponible');
+            document.getElementById('modalMileage').innerText = "Kilométrage : " + car.mileage + " km";
+            document.getElementById('modalYear').innerText = "Année : " + car.year;
+            document.getElementById('modalPrice').innerText = "Prix : " + car.price + " €";
+            document.getElementById('modal-container').classList.add('active');
+        }
 
-function closeModal() {
-    document.getElementById('modal-container').classList.remove('active');
-}
+        function closeModal() {
+            document.getElementById('modal-container').classList.remove('active');
+        }
 
-function purchaseCar() {
-    alert("Fonction d'achat en cours de développement.");
-}
-</script>
+        function purchaseCar() {
+            alert("Fonction d'achat en cours de développement.");
+        }
+    </script>
 </body>
-
 </html>

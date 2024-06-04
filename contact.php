@@ -1,39 +1,36 @@
 <?php
-session_start();
+require 'config.php';
 
-// Récupérer les informations de connexion de la base de données à partir des variables d'environnement
-$cleardb_url = parse_url(getenv("CLEARDB_DATABASE_URL"));
-$servername = $cleardb_url["host"];
-$username = $cleardb_url["user"];
-$password = $cleardb_url["pass"];
-$dbname = substr($cleardb_url["path"], 1);
-
-// Connexion à la base de données
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Vérification de la connexion
-if ($conn->connect_error) {
-    die("Échec de la connexion : " . $conn->connect_error);
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['nom'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nom = $_POST['nom'];
     $email = $_POST['email'];
     $message = $_POST['message'];
 
-    // Insertion du message de contact
-    $sql = "INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $name, $email, $message);
-    
-    if ($stmt->execute()) {
-        echo "Message envoyé avec succès.";
-    } else {
-        echo "Erreur lors de l'envoi du message : " . $stmt->error;
-    }
+    $sql = "INSERT INTO contacts (nom, email, message) VALUES (?, ?, ?)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$nom, $email, $message]);
 
-    $stmt->close();
+    echo "Merci pour votre message!";
 }
-
-$conn->close();
 ?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Contactez-nous</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Contactez-nous</h1>
+    <form method="post">
+        <label for="nom">Nom:</label>
+        <input type="text" id="nom" name="nom" required>
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" required></textarea>
+        <button type="submit">Envoyer</button>
+    </form>
+</body>
+</html>

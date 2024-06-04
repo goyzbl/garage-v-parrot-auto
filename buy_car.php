@@ -1,58 +1,44 @@
 <?php
+require 'config.php';
 session_start();
 
-// Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
+    header("Location: login.php");
     exit();
 }
 
-// Récupérer les informations de connexion de la base de données à partir des variables d'environnement
-$cleardb_url = parse_url(getenv("CLEARDB_DATABASE_URL"));
-$servername = $cleardb_url["host"];
-$username = $cleardb_url["user"];
-$password = $cleardb_url["pass"];
-$dbname = substr($cleardb_url["path"], 1);
+$car_id = $_GET['id'];
+$sql = "SELECT * FROM cars WHERE id = ?";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$car_id]);
+$car = $stmt->fetch();
 
-// Connexion à la base de données
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Vérification de la connexion
-if ($conn->connect_error) {
-    die("Échec de la connexion : " . $conn->connect_error);
+if (!$car) {
+    echo "Voiture non trouvée.";
+    exit();
 }
 
-// Vérifier si le formulaire a été soumis
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['car_id'])) {
-    $car_id = $_POST['car_id'];
-    $user_id = $_SESSION['user_id'];
-
-    // Ajouter l'achat dans la base de données
-    $sql = "INSERT INTO purchases (user_id, car_id) VALUES (?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $user_id, $car_id);
-
-    if ($stmt->execute()) {
-        echo "Achat effectué avec succès.";
-    } else {
-        echo "Erreur lors de l'achat : " . $stmt->error;
-    }
-
-    $stmt->close();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Process the purchase (e.g., update the database, send a confirmation email, etc.)
+    echo "Achat confirmé!";
+    exit();
 }
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Achat de Voiture</title>
+    <title>Acheter une voiture</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>Achat de Voiture</h2>
-    <p>Merci pour votre achat. Nous vous contacterons bientôt pour finaliser les détails.</p>
-    <a href="index.php">Retour à l'accueil</a>
+    <h1>Acheter la voiture: <?php echo htmlspecialchars($car['title']); ?></h1>
+    <form method="post">
+        <p>Kilométrage: <?php echo htmlspecialchars($car['mileage']); ?> km</p>
+        <p>Année: <?php echo htmlspecialchars($car['year']); ?></p>
+        <p>Prix: <?php echo htmlspecialchars($car['price']); ?> €</p>
+        <button type="submit">Confirmer l'achat</button>
+    </form>
 </body>
 </html>
