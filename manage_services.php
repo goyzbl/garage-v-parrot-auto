@@ -1,17 +1,18 @@
 <?php
 session_start();
 
-// Vérification que l'utilisateur est un administrateur
+// Vérifier si l'utilisateur est un administrateur
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
     header("Location: index.php");
     exit();
 }
 
-// Configuration de la base de données
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "garage_db";
+// Récupérer les informations de connexion de la base de données à partir des variables d'environnement
+$cleardb_url = parse_url(getenv("CLEARDB_DATABASE_URL"));
+$servername = $cleardb_url["host"];
+$username = $cleardb_url["user"];
+$password = $cleardb_url["pass"];
+$dbname = substr($cleardb_url["path"], 1);
 
 // Connexion à la base de données
 $conn = new mysqli($servername, $username, $password, $dbname);

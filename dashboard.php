@@ -8,7 +8,6 @@ if (!isset($_SESSION['user_id'])) {
 
 // Vérification du rôle de l'utilisateur
 $is_admin = $_SESSION['role'] == 'admin';
-
 ?>
 <!DOCTYPE html>
 <html lang="fr">

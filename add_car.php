@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est connecté et est un employé ou un administrateur
+// Vérifier avec soin si l'utilisateur est connecté et est un employé ou un administrateur
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'employee'])) {
     header("Location: index.php");
     exit();

@@ -1,11 +1,12 @@
 <?php
 session_start();
 
-// Configuration de la base de données
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "garage_db";
+// Récupérer les informations de connexion de la base de données à partir des variables d'environnement
+$cleardb_url = parse_url(getenv("CLEARDB_DATABASE_URL"));
+$servername = $cleardb_url["host"];
+$username = $cleardb_url["user"];
+$password = $cleardb_url["pass"];
+$dbname = substr($cleardb_url["path"], 1);
 
 // Connexion à la base de données
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -28,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->execute()) {
         echo "Message envoyé avec succès.";
     } else {
-        echo "Erreur lors de l'envoi du message.";
+        echo "Erreur lors de l'envoi du message : " . $stmt->error;
     }
 
     $stmt->close();
